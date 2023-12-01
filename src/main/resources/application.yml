@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mechDB
+    username: postgres
+    password: levi3108
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      show-sql: false
+        
