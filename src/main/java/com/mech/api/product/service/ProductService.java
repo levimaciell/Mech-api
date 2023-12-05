@@ -3,12 +3,14 @@ package com.mech.api.product.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.mech.api.product.dto.ProductCreationDto;
 import com.mech.api.product.dto.ProductDto;
 import com.mech.api.product.dto.ProductUpdateDto;
 import com.mech.api.product.entity.Product;
+import com.mech.api.product.exceptions.ProductServiceException;
 import com.mech.api.product.repository.ProductRepository;
 
 @Service
@@ -19,7 +21,17 @@ public class ProductService {
     
     public void createProduct(ProductCreationDto productDto){
 
-        //TODO:Check for errors
+        if(productDto == null) 
+            throw new ProductServiceException("Json informed is null!", HttpStatus.BAD_REQUEST);
+
+        if(productDto.name() == null || productDto.name().isBlank())
+            throw new ProductServiceException("Cannot create a product without a name", HttpStatus.BAD_REQUEST);
+
+        if(productDto.price() == null)
+            throw new ProductServiceException("Cannot create a product without a price", HttpStatus.BAD_REQUEST);        
+
+        if(productDto.price() <= 0 )
+            throw new ProductServiceException("Product must have a price greater than zero!", HttpStatus.BAD_REQUEST);
 
         Product product = convertToProduct(productDto);
 
@@ -28,9 +40,11 @@ public class ProductService {
     }
 
     public ProductDto getProduct(String id){
-        //TODO:Check for errors
+        if(id == null || id.isBlank()) 
+            throw new ProductServiceException("Id is needed to get a product", HttpStatus.BAD_REQUEST);
 
-        Product product = repository.findById(id).orElseThrow();
+        Product product = repository.findById(id)
+        .orElseThrow(() -> new ProductServiceException("Product not found", HttpStatus.NOT_FOUND));
 
         return convertToDto(product);
     }
@@ -41,9 +55,27 @@ public class ProductService {
     }
 
     public ProductDto updateProduct(ProductUpdateDto updateDto){
-        //TODO:Check for errors
+        if(updateDto == null)
+            throw new ProductServiceException("A body is needed for updating a product!", HttpStatus.BAD_REQUEST);
 
-        Product product = repository.findById(updateDto.updateId()).orElseThrow();
+        if(updateDto.updateId() == null || updateDto.updateId().isBlank())
+            throw new ProductServiceException("An id is needed to update the product", HttpStatus.BAD_REQUEST);
+
+        if(updateDto.updateName() == null || updateDto.updateName().isBlank())
+            throw new ProductServiceException("A name to update is needed to update the product", HttpStatus.BAD_REQUEST);
+
+        if(updateDto.updateDescription() == null || updateDto.updateDescription().isBlank())
+            throw new ProductServiceException("A description to update is needed to update the product", HttpStatus.BAD_REQUEST);
+
+        if(updateDto.updatePrice() == null)
+            throw new ProductServiceException("A price to update is needed to update the product", HttpStatus.BAD_REQUEST);
+
+        if(updateDto.updatePrice() <= 0)
+            throw new ProductServiceException("Update price must be greater than 0!", HttpStatus.BAD_REQUEST);
+        
+        Product product = repository.findById(updateDto.updateId())
+        .orElseThrow(() -> new ProductServiceException("Product not found for update", HttpStatus.NOT_FOUND));
+
         product.setName(updateDto.updateName());
         product.setDescription(updateDto.updateDescription());
         product.setPrice(updateDto.updatePrice());
@@ -54,7 +86,11 @@ public class ProductService {
     }
 
     public void deleteProduct(String id){
-        //TODO:Check for errors
+        if(id == null || id.isBlank())
+            throw new ProductServiceException("An id is needed to delete a product", HttpStatus.BAD_REQUEST);
+        
+        if(!repository.existsById(id))
+            throw new ProductServiceException("Product to delete not found", HttpStatus.NOT_FOUND);
 
         repository.deleteById(id);
         
@@ -72,7 +108,5 @@ public class ProductService {
         return new ProductDto(product.getId(), product.getName(), 
         product.getDescription(), product.getPrice());
     }
-
-
 
 }
