@@ -7,8 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.mech.api.product.dto.ProductCreationDto;
+import com.mech.api.product.dto.ProductCreationDtoV2;
 import com.mech.api.product.dto.ProductDto;
+import com.mech.api.product.dto.ProductDtoV2;
 import com.mech.api.product.dto.ProductUpdateDto;
+import com.mech.api.product.dto.ProductUpdateDtoV2;
 import com.mech.api.product.entity.Product;
 import com.mech.api.product.exceptions.ProductServiceException;
 import com.mech.api.product.repository.ProductRepository;
@@ -39,6 +42,10 @@ public class ProductService {
 
     }
 
+    public void createProductV2(ProductCreationDtoV2 productDto){
+        createProduct(new ProductCreationDto(productDto.name(), null, productDto.price()));
+    }
+
     public ProductDto getProduct(String id){
         if(id == null || id.isBlank()) 
             throw new ProductServiceException("Id is needed to get a product", HttpStatus.BAD_REQUEST);
@@ -49,9 +56,23 @@ public class ProductService {
         return convertToDto(product);
     }
 
+    public ProductDtoV2 getProductV2(String id){
+        ProductDto dto = getProduct(id);
+        return new ProductDtoV2(dto.id(), dto.name(), dto.price());
+    }
+
     public List<ProductDto> getAllProducts(){
 
         return repository.findAll().stream().map(x -> convertToDto(x)).toList();
+    }
+
+    public List<ProductDtoV2> getAllProductsV2(){
+
+        return repository.findAll().stream().map(x -> new ProductDtoV2(
+            x.getId(),
+            x.getName(),
+            x.getPrice()
+        )).toList();
     }
 
     public ProductDto updateProduct(ProductUpdateDto updateDto){
@@ -63,9 +84,6 @@ public class ProductService {
 
         if(updateDto.updateName() == null || updateDto.updateName().isBlank())
             throw new ProductServiceException("A name to update is needed to update the product", HttpStatus.BAD_REQUEST);
-
-        if(updateDto.updateDescription() == null || updateDto.updateDescription().isBlank())
-            throw new ProductServiceException("A description to update is needed to update the product", HttpStatus.BAD_REQUEST);
 
         if(updateDto.updatePrice() == null)
             throw new ProductServiceException("A price to update is needed to update the product", HttpStatus.BAD_REQUEST);
@@ -83,6 +101,13 @@ public class ProductService {
         repository.save(product);
 
         return convertToDto(product);
+    }
+
+    public ProductDtoV2 updateProductV2(ProductUpdateDtoV2 productDto){
+        ProductDto product = updateProduct(new ProductUpdateDto(productDto.updateId(), productDto.updateName()
+        , null, productDto.updatePrice()));
+
+        return new ProductDtoV2(product.id(), product.name(), product.price());
     }
 
     public void deleteProduct(String id){
