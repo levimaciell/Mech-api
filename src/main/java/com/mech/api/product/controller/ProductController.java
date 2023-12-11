@@ -3,6 +3,7 @@ package com.mech.api.product.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,42 +28,55 @@ public class ProductController {
     @Autowired
     private ProductService service;
 
-    @PostMapping
+    @PostMapping(
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"}
+    )
     public void createProduct(@RequestBody ProductCreationDto productDto){
         service.createProduct(productDto);
     }
 
-    @PostMapping(value = "/v2")
+    @PostMapping(value = "/v2",
+    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"})
     public void createProductV2(@RequestBody ProductCreationDtoV2 productDto){
         service.createProductV2(productDto);
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}",
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"})
     public ProductDto getProduct(@PathVariable String id){
         return service.getProduct(id);
     }
 
-    @GetMapping(value = "/{id}/v2")
+    @GetMapping(value = "/{id}/v2",
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"})
     public ProductDtoV2 getProductV2(@PathVariable String id){
         return service.getProductV2(id);
     }
 
-    @GetMapping
+    @GetMapping(
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"}
+    )
     public List<ProductDto> getAllProducts(){
         return service.getAllProducts();
     }
 
-    @GetMapping("/v2")
+    @GetMapping(value = "/v2",
+    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"})
     public List<ProductDtoV2> getAllProductsV2(){
         return service.getAllProductsV2();
     }
 
-    @PutMapping()
+    @PutMapping(
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"},
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"}
+    )
     public ProductDto updateProduct(@RequestBody ProductUpdateDto updateDto){
         return service.updateProduct(updateDto);
     }
 
-    @PutMapping(value = "/v2")
+    @PutMapping(value = "/v2",
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"},
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "application/x-yaml"})
     public ProductDtoV2 updateProductV2(@RequestBody ProductUpdateDtoV2 updateDto){
         return service.updateProductV2(updateDto);
     }
