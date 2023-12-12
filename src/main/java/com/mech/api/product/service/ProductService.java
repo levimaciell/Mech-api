@@ -27,13 +27,13 @@ public class ProductService {
         if(productDto == null) 
             throw new ProductServiceException("Json informed is null!", HttpStatus.BAD_REQUEST);
 
-        if(productDto.name() == null || productDto.name().isBlank())
+        if(productDto.getName() == null || productDto.getName().isBlank())
             throw new ProductServiceException("Cannot create a product without a name", HttpStatus.BAD_REQUEST);
 
-        if(productDto.price() == null)
+        if(productDto.getPrice() == null)
             throw new ProductServiceException("Cannot create a product without a price", HttpStatus.BAD_REQUEST);        
 
-        if(productDto.price() <= 0 )
+        if(productDto.getPrice() <= 0 )
             throw new ProductServiceException("Product must have a price greater than zero!", HttpStatus.BAD_REQUEST);
 
         Product product = convertToProduct(productDto);
@@ -43,7 +43,7 @@ public class ProductService {
     }
 
     public void createProductV2(ProductCreationDtoV2 productDto){
-        createProduct(new ProductCreationDto(productDto.name(), null, productDto.price()));
+        createProduct(new ProductCreationDto(productDto.getName(), null, productDto.getPrice()));
     }
 
     public ProductDto getProduct(String id){
@@ -58,7 +58,7 @@ public class ProductService {
 
     public ProductDtoV2 getProductV2(String id){
         ProductDto dto = getProduct(id);
-        return new ProductDtoV2(dto.id(), dto.name(), dto.price());
+        return new ProductDtoV2(dto.getId(), dto.getName(), dto.getPrice());
     }
 
     public List<ProductDto> getAllProducts(){
@@ -79,24 +79,24 @@ public class ProductService {
         if(updateDto == null)
             throw new ProductServiceException("A body is needed for updating a product!", HttpStatus.BAD_REQUEST);
 
-        if(updateDto.updateId() == null || updateDto.updateId().isBlank())
+        if(updateDto.getUpdateId() == null || updateDto.getUpdateId().isBlank())
             throw new ProductServiceException("An id is needed to update the product", HttpStatus.BAD_REQUEST);
 
-        if(updateDto.updateName() == null || updateDto.updateName().isBlank())
+        if(updateDto.getUpdateName() == null || updateDto.getUpdateName().isBlank())
             throw new ProductServiceException("A name to update is needed to update the product", HttpStatus.BAD_REQUEST);
 
-        if(updateDto.updatePrice() == null)
+        if(updateDto.getUpdatePrice() == null)
             throw new ProductServiceException("A price to update is needed to update the product", HttpStatus.BAD_REQUEST);
 
-        if(updateDto.updatePrice() <= 0)
+        if(updateDto.getUpdatePrice() <= 0)
             throw new ProductServiceException("Update price must be greater than 0!", HttpStatus.BAD_REQUEST);
         
-        Product product = repository.findById(updateDto.updateId())
+        Product product = repository.findById(updateDto.getUpdateId())
         .orElseThrow(() -> new ProductServiceException("Product not found for update", HttpStatus.NOT_FOUND));
 
-        product.setName(updateDto.updateName());
-        product.setDescription(updateDto.updateDescription());
-        product.setPrice(updateDto.updatePrice());
+        product.setName(updateDto.getUpdateName());
+        product.setDescription(updateDto.getUpdateDescription());
+        product.setPrice(updateDto.getUpdatePrice());
 
         repository.save(product);
 
@@ -104,10 +104,9 @@ public class ProductService {
     }
 
     public ProductDtoV2 updateProductV2(ProductUpdateDtoV2 productDto){
-        ProductDto product = updateProduct(new ProductUpdateDto(productDto.updateId(), productDto.updateName()
-        , null, productDto.updatePrice()));
+        ProductDto product = updateProduct(new ProductUpdateDto(productDto.getUpdateId(), productDto.getUpdateName(), null, productDto.getUpdatePrice()));
 
-        return new ProductDtoV2(product.id(), product.name(), product.price());
+        return new ProductDtoV2(product.getId(), product.getName(), product.getPrice());
     }
 
     public void deleteProduct(String id){
@@ -123,9 +122,9 @@ public class ProductService {
 
     public Product convertToProduct(ProductCreationDto dto){
         Product product = new Product();
-        product.setName(dto.name());
-        product.setDescription(dto.description());
-        product.setPrice(dto.price());
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
         return product;
     }
 

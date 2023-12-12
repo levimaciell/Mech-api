@@ -24,9 +24,9 @@ public class ProductServiceTest {
         69.99);
 
         Product product = service.convertToProduct(dto);
-        assertEquals(dto.name(), product.getName());
-        assertEquals(dto.description(), product.getDescription());
-        assertEquals(dto.price(), product.getPrice());
+        assertEquals(dto.getName(), product.getName());
+        assertEquals(dto.getDescription(), product.getDescription());
+        assertEquals(dto.getPrice(), product.getPrice());
     }
 
     @Test
@@ -37,10 +37,10 @@ public class ProductServiceTest {
 
         ProductDto dto = service.convertToDto(product);
 
-        assertEquals(dto.id(), product.getId());
-        assertEquals(dto.name(), product.getName());
-        assertEquals(dto.description(), product.getDescription());
-        assertEquals(dto.price(), product.getPrice());
+        assertEquals(dto.getId(), product.getId());
+        assertEquals(dto.getName(), product.getName());
+        assertEquals(dto.getDescription(), product.getDescription());
+        assertEquals(dto.getPrice(), product.getPrice());
 
     }
 
