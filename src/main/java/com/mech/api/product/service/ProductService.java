@@ -3,9 +3,12 @@ package com.mech.api.product.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.mech.api.product.controller.ProductController;
 import com.mech.api.product.dto.ProductCreationDto;
 import com.mech.api.product.dto.ProductCreationDtoV2;
 import com.mech.api.product.dto.ProductDto;
@@ -53,17 +56,25 @@ public class ProductService {
         Product product = repository.findById(id)
         .orElseThrow(() -> new ProductServiceException("Product not found", HttpStatus.NOT_FOUND));
 
-        return convertToDto(product);
+        ProductDto dto = convertToDto(product);
+        
+        dto.add(linkTo(methodOn(ProductController.class).getProduct(id)).withSelfRel());
+
+        return dto;
     }
 
     public ProductDtoV2 getProductV2(String id){
         ProductDto dto = getProduct(id);
-        return new ProductDtoV2(dto.getId(), dto.getName(), dto.getPrice());
+        return new ProductDtoV2(dto.getKey(), dto.getName(), dto.getPrice());
     }
 
     public List<ProductDto> getAllProducts(){
 
-        return repository.findAll().stream().map(x -> convertToDto(x)).toList();
+        List<ProductDto> list = repository.findAll().stream().map(x -> convertToDto(x)).toList();
+
+        list.stream().forEach(x -> x.add(linkTo(methodOn(ProductController.class).getAllProducts()).withSelfRel()));
+        
+        return list;
     }
 
     public List<ProductDtoV2> getAllProductsV2(){
@@ -100,13 +111,13 @@ public class ProductService {
 
         repository.save(product);
 
-        return convertToDto(product);
+        return convertToDto(product).add(linkTo(methodOn(ProductController.class).updateProduct(updateDto)).withSelfRel());
     }
 
     public ProductDtoV2 updateProductV2(ProductUpdateDtoV2 productDto){
         ProductDto product = updateProduct(new ProductUpdateDto(productDto.getUpdateId(), productDto.getUpdateName(), null, productDto.getUpdatePrice()));
 
-        return new ProductDtoV2(product.getId(), product.getName(), product.getPrice());
+        return new ProductDtoV2(product.getKey(), product.getName(), product.getPrice());
     }
 
     public void deleteProduct(String id){

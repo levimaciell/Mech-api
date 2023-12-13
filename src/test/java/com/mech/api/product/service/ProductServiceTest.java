@@ -37,7 +37,7 @@ public class ProductServiceTest {
 
         ProductDto dto = service.convertToDto(product);
 
-        assertEquals(dto.getId(), product.getId());
+        assertEquals(dto.getKey(), product.getId());
         assertEquals(dto.getName(), product.getName());
         assertEquals(dto.getDescription(), product.getDescription());
         assertEquals(dto.getPrice(), product.getPrice());
